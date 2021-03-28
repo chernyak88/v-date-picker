@@ -38,19 +38,30 @@
     </v-app-bar>
 
     <v-main>
-      <DatePicker range/>
+      <DatePicker :onDateChange="onDateChange"/>
+      <DateRangePicker :onDatesChange="onDatesChange"/>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import DatePicker from './components/DatePicker';
+import DateRangePicker from './components/DateRangePicker';
 
 export default {
   name: 'App',
 
   components: {
     DatePicker,
+    DateRangePicker
+  },
+  methods: {
+    onDateChange (newDate) {
+      console.log(newDate)
+    },
+    onDatesChange (newDates) {
+      console.log(newDates)
+    }
   }
 };
 </script>

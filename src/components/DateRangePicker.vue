@@ -9,17 +9,26 @@
         >
           <template v-slot:activator="{ on }">
             <v-text-field
-              :value="singleDateFormatted"
+              :value="dateFromFormatted"
               clearable
-              label="Date"
-              append-icon="mdi-calendar"
+              label="From date"
               v-on="on"
-              @change="handleInputChange"
+              readonly
+            >
+            </v-text-field>
+            <v-text-field
+              :value="dateToFormatted"
+              clearable
+              label="To date"
+              v-on="on"
+              append-icon="mdi-calendar"
+              readonly
             >
             </v-text-field>
           </template>
           <v-date-picker
-            v-model="singleDate"
+            v-model="rangeDates"
+            range
             @change="handleChange"
             first-day-of-week="1"
             header-color="#1E1E1E"
@@ -33,30 +42,32 @@
 <script>
 import moment from 'moment'
 export default {
-  name: 'DatePicker',
+  name: 'DateRangePicker',
   props: {
-    onDateChange: {
+    onDatesChange: {
       type: Function,
       required: true
     }
   },
   data: () => ({
-    singleDate: new Date().toISOString().substr(0, 10),
+    rangeDates: [
+      new Date().toISOString().substr(0, 10),
+      new Date().toISOString().substr(0, 10)
+    ],
     menu: false
   }),
   computed: {
-    singleDateFormatted () {
-      return moment(this.singleDate).format('DD/MM/YYYY')
+    dateFromFormatted () {
+      return moment(this.rangeDates[0]).format('DD/MM/YYYY')
+    },
+    dateToFormatted () {
+      return moment(this.rangeDates[1]).format('DD/MM/YYYY')
     }
   },
   methods: {
     handleChange () {
       this.menu = false
-      this.onDateChange(this.singleDateFormatted)
-    },
-    handleInputChange (inputValue) {
-      this.singleDate = moment(inputValue).format('DD/MM/YYYY');
-      this.onDateChange(this.singleDate)
+      this.onDatesChange([this.dateFromFormatted, this.dateToFormatted])
     }
   }
 }
