@@ -60,8 +60,12 @@ export default {
       this.onDateChange(this.singleDateFormatted)
     },
     handleInputChange (inputValue) {
-      this.singleDate = moment(inputValue).format('DD/MM/YYYY');
-      this.onDateChange(this.singleDate)
+      if(!moment(inputValue).isValid()) {
+        alert('Некорректный формат даты')
+      } else {
+        this.singleDate = moment(inputValue).format('DD/MM/YYYY')
+        this.onDateChange(this.singleDate)
+      }
     }
   }
 }
