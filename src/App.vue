@@ -38,30 +38,92 @@
     </v-app-bar>
 
     <v-main>
-      <DatePicker :onDateChange="onDateChange"/>
-      <DateRangePicker :onDatesChange="onDatesChange"/>
+      <v-container grid-list-md>
+        <v-layout row wrap>
+          <div class="mr-2">Example with string</div>
+          <v-flex xs12 lg6>
+            <v-text-field
+              v-model="date"
+              clearable
+              label="Date"
+              @blur="handleChangeDate(date)"
+            >
+            </v-text-field>
+            <date-picker
+              :value="date"
+              :mask="mask"
+              ref="datepicker"
+              @onDateChange="date = $event"
+              >
+              </date-picker>
+          </v-flex>
+          <div class="mr-2">Example with array</div>
+          <v-flex xs12 lg6>
+            <v-text-field
+              v-model="dates[0]"
+              clearable
+              label="From date"
+            >
+            </v-text-field>
+            <v-text-field
+              v-model="dates[1]"
+              clearable
+              label="To date"
+              @blur="handleChangeDates(dates)"
+            >
+            </v-text-field>
+            <date-picker
+              ref="rangedatepicker"
+              :value="dates"
+              :mask="mask"
+              @onDatesChange="dates = $event"
+            >
+            </date-picker>
+          </v-flex>
+        </v-layout>
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import DatePicker from './components/DatePicker';
-import DateRangePicker from './components/DateRangePicker';
 
 export default {
   name: 'App',
-
   components: {
-    DatePicker,
-    DateRangePicker
+    DatePicker
   },
+  data: () => ({
+    date: '',
+    dates: [],
+    mask: "DD/MM/YYYY"
+  }),
   methods: {
-    onDateChange (newDate) {
-      console.log(newDate)
+    handleChangeDate (newDate) {
+      this.$refs.datepicker.getDate(newDate)
     },
-    onDatesChange (newDates) {
-      console.log(newDates)
+    handleChangeDates (newDates) {
+      this.$refs.rangedatepicker.getDates(newDates)
     }
   }
 };
 </script>
+<style>
+.container.grid-list-md .layout .flex {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.container.grid-list-md .layout .flex {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.row {
+  flex-direction: column;
+}
+.v-input {
+  margin-right: 20px;
+}
+</style>

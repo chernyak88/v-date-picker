@@ -1,82 +1,97 @@
 <template>
-  <v-container grid-list-md>
-    <v-layout row wrap>
-      <v-flex xs12 lg6>
-        <v-menu
-          v-model="menu"
-          :close-on-content-click="false"
-          max-width="290"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              :value="singleDateFormatted"
-              clearable
-              label="Date"
-              append-icon="mdi-calendar"
-              v-on="on"
-              @change="handleInputChange"
-            >
-            </v-text-field>
-          </template>
-          <v-date-picker
-            v-model="singleDate"
-            @change="handleChange"
-            first-day-of-week="1"
-            header-color="#1E1E1E"
-          ></v-date-picker>
-        </v-menu>
-      </v-flex>
-    </v-layout>
-  </v-container>
+  <v-menu
+    v-model="menu"
+    :close-on-content-click="false"
+    max-width="290"
+  >
+    <template v-slot:activator="{ on }">
+      <v-icon
+        medium
+        v-on="on"
+      >
+        mdi-calendar
+      </v-icon>
+    </template>
+    <v-date-picker v-if="isArray"
+      v-model="localValue"
+      first-day-of-week="1"
+      header-color="#1E1E1E"
+      range
+      @change="setDates"
+    >
+    </v-date-picker>
+    <v-date-picker v-else
+      v-model="localValue"
+      first-day-of-week="1"
+      header-color="#1E1E1E"
+      @change="setDate"
+    ></v-date-picker>
+  </v-menu>
 </template>
 
 <script>
-// Для наглядности компонент разбит на два файла.
-// При необходимости можно объединить всю верстку и логику в один файл,
-// и отрисовывать необходимую часть через v-if, например, в зависимости
-// от приходящего пропса (если он есть, отображаем DatePicker с диапазоном
-// дат, если нет - обычный)
 import moment from 'moment'
+
 export default {
   name: 'DatePicker',
   props: {
-    onDateChange: {
-      type: Function,
-      required: true
-    }
+    value: [String, Array],
+    mask: String
   },
   data: () => ({
-    singleDate: new Date().toISOString().substr(0, 10),
-    menu: false
+    localValue: null,
+    isValid: false,
+    menu: false,
+    isArray: false,
+    curDate: moment().format('YYYY-DD-MM'),
+    fromDate: moment().format(),
+    toDate: moment().add(7,'d').format()
   }),
-  computed: {
-    singleDateFormatted () {
-      return moment(this.singleDate).format('DD/MM/YYYY')
+  mounted() {
+    if(Array.isArray(this.value)) {
+      this.isArray = true
+      this.localValue = [this.fromDate, this.toDate]
+      this.setDates()
+    } else {
+      this.localValue = this.curDate
+      this.setDate()
     }
   },
   methods: {
-    handleChange () {
-      this.menu = false
-      this.onDateChange(this.singleDateFormatted)
+    setDates () {
+        this.menu = false
+        const formattedValue = this.localValue.sort().map(date => moment(date).format(this.mask))
+        this.$emit('onDatesChange', formattedValue)
     },
-    handleInputChange (inputValue) {
-      if(!moment(inputValue).isValid()) {
-        alert('Некорректный формат даты')
+    setDate () {
+        this.menu = false
+        this.$emit('onDateChange', moment(this.localValue).format(this.mask))
+    },
+    getDate (val) {
+      if(moment(val).isValid()) {
+        this.localValue = moment(val).format('YYYY-DD-MM')
+        this.setDate()
       } else {
-        this.singleDate = moment(inputValue).format('DD/MM/YYYY')
-        this.onDateChange(this.singleDate)
+        this.localValue = this.curDate
+        this.setDate()
+      }
+    },
+    getDates (val) {
+      if(moment(val[0]).isValid() && moment(val[1]).isValid()) {
+        this.localValue = [moment(val[0]).format('YYYY-DD-MM'), moment(val[1]).format('YYYY-DD-MM')]
+        this.setDates()
+      } else {
+        this.localValue = [this.fromDate, this.toDate]
+        this.setDates()
       }
     }
   }
 }
 </script>
-
 <style scoped>
-.container.grid-list-md .layout .flex {
-  display: flex;
-  justify-content: space-between;
-}
-.v-input {
-  max-width: 45%;
+.v-icon.v-icon.v-icon--link {
+  width: 24px;
+  height: 24px;
+  margin-left: -10px;
 }
 </style>
