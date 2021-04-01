@@ -43,7 +43,7 @@ export default {
     isValid: false,
     menu: false,
     isArray: false,
-    curDate: moment().format('YYYY-DD-MM'),
+    curDate: moment().format('YYYY-MM-DD'),
     fromDate: moment().format(),
     toDate: moment().add(7,'d').format()
   }),
